@@ -1,0 +1,8 @@
+name: jupyter-nightly
+channels:
+- conda-forge
+- defaults
+dependencies:
+- jupyter
+- jupyterlab
+- jupyter_kernel_gateway
