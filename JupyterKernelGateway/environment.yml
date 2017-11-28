@@ -1,4 +1,4 @@
-name: jupyter-nightly
+name: jupyter-kernel-gateway
 channels:
 - conda-forge
 - defaults
