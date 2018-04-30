@@ -61,5 +61,9 @@ target/
 # pyenv python configuration file
 .python-version
 
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
 # exclude data from source control by default
 /data/
