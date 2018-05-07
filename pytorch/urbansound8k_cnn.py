@@ -13,10 +13,10 @@ parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=1001, metavar='N',
-                    help='number of epochs to train (default: 1001)')
-parser.add_argument('--lr', type=float, default=0.0001, metavar='LR',
-                    help='learning rate (default: 0.0001)')
+parser.add_argument('--epochs', type=int, default=1, metavar='N',
+                    help='number of epochs to train (default: 1)')
+parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
+                    help='learning rate (default: 0.001)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
@@ -32,10 +32,6 @@ device = torch.device('cuda' if use_cuda else 'cpu')
 kwargs = {'num_workers': 0, 'pin_memory': True} if use_cuda else {}
 
 # Hyper Parameters
-input_size = 166
-hidden_size_1 = 128
-hidden_size_2 = 64
-num_classes = 10
 num_epochs = args.epochs
 batch_size = args.batch_size
 learning_rate = args.lr
@@ -47,8 +43,8 @@ class SoundDataset(Dataset):
     '''
 
     def __init__(self, features_file, labels_file, transform=None):
-        self.X_train = np.loadtxt(features_file)
-        self.y_train = np.loadtxt(labels_file)
+        self.X_train = np.load(features_file)
+        self.y_train = np.load(labels_file)
         self.transform = transform
 
     def __len__(self):
@@ -64,35 +60,42 @@ class SoundDataset(Dataset):
         return data, label
 
 
-# 2-layer net
+# CNN
 class Net(nn.Module):
-    def __init__(self, in_dim, h1, h2, out_dim):
+    def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(in_dim, h1)
-        self.fc2 = nn.Linear(h1, h2)
-        self.fc3 = nn.Linear(h2, out_dim)
+        self.conv1 = nn.Conv2d(2, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 12 * 7, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
+        x = x.view(-1, 2, 60, 41) # image_# x n_channel x width x height
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(-1, 16 * 12 * 7)
         x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training)
         x = F.relu(self.fc2(x))
-        x = F.softmax(self.fc3(x), dim=1)
-        return x
+        return F.softmax(x, dim=1)
 
 
 if __name__ == '__main__':
-    dset_train = SoundDataset(features_file='../data/urbansound_train_features.txt',
-                              labels_file='../data/urbansound_train_labels.txt')
-    dset_test = SoundDataset(features_file='../data/urbansound_test_features.txt',
-                             labels_file='../data/urbansound_test_labels.txt')
+    dset_train = SoundDataset(features_file='../data/urbansound_train_features_CNN.npy',
+                              labels_file='../data/urbansound_train_labels_CNN.npy')
+    dset_test = SoundDataset(features_file='../data/urbansound_test_features_CNN.npy',
+                             labels_file='../data/urbansound_test_labels_CNN.npy')
     dset_loader = DataLoader(dset_train, batch_size=batch_size, shuffle=True, **kwargs)
-    test_loader = DataLoader(dset_test, batch_size=args.test_batch_size, shuffle=True, **kwargs)
+    test_loader = DataLoader(dset_test, batch_size=batch_size, shuffle=True, **kwargs)
 
-    net = Net(input_size, hidden_size_1, hidden_size_2, num_classes).to(device)
+    net = Net().to(device)
+
+    # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
 
-    # Train model
+    # Train the Model
     for epoch in range(num_epochs):
         net.train()
         for batch_idx, (data, target) in enumerate(dset_loader):
@@ -105,7 +108,8 @@ if __name__ == '__main__':
             optimizer.step()
 
             # print statistics
-            if epoch % args.log_interval == 0 and batch_idx % 10 == 0:
+            # if epoch % (num_epochs // 10) == 0 and batch_idx % 10 == 0:
+            if batch_idx % 10 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch,
                     batch_idx * len(data),
@@ -113,6 +117,7 @@ if __name__ == '__main__':
                     100. * batch_idx / len(dset_loader),
                     loss.data.item()
                 ))
+
     print('Training over')
 
     # Test model
@@ -124,8 +129,8 @@ if __name__ == '__main__':
         for data, labels in test_loader:
             data, target = data.to(device), target.to(device)
             outputs = net(data)
-            predicted = torch.max(outputs, 1)[1].to(device)
+            predicted = torch.max(outputs, 1)[1]
             total += labels.size(0)
-            correct += (predicted == torch.max(labels, 1)[1]).sum()
+            correct += (predicted == torch.max(labels, 1)[1].to(device)).sum()
 
     print('Accuracy of the network : %d %%' % (100 * correct / total))
