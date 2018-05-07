@@ -9,14 +9,14 @@ from torch.utils.data import DataLoader
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Urbansound8k MLP')
-parser.add_argument('--batch-size', type=int, default=64, metavar='N',
-                    help='input batch size for training (default: 64)')
+parser.add_argument('--batch-size', type=int, default=1000, metavar='N',
+                    help='input batch size for training (default: 1000)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=1, metavar='N',
-                    help='number of epochs to train (default: 1)')
-parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
-                    help='learning rate (default: 0.001)')
+parser.add_argument('--epochs', type=int, default=30, metavar='N',
+                    help='number of epochs to train (default: 300)')
+parser.add_argument('--lr', type=float, default=0.002, metavar='LR',
+                    help='learning rate (default: 0.002)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
@@ -35,6 +35,8 @@ kwargs = {'num_workers': 0, 'pin_memory': True} if use_cuda else {}
 num_epochs = args.epochs
 batch_size = args.batch_size
 learning_rate = args.lr
+momentum = 0.9
+weight_decay = 0.001
 
 
 class SoundDataset(Dataset):
@@ -64,24 +66,29 @@ class SoundDataset(Dataset):
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(2, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 12 * 7, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.conv1 = nn.Conv2d(in_channels=2, out_channels=2, kernel_size=(57, 6), stride=(1, 1))
+        self.pool1 = nn.MaxPool2d(kernel_size=(4, 3), stride=(1,3))
+        self.conv2 = nn.Conv2d(in_channels=2, out_channels=2, kernel_size=(1, 3), stride=(1, 1))
+        self.pool2 = nn.MaxPool2d(kernel_size=(1, 3), stride=(1, 3))
+        self.fc1 = nn.Linear(6, 5000)
+        self.fc2 = nn.Linear(5000, 5000)
+        self.fc3 = nn.Linear(5000, 10)
 
     def forward(self, x):
-        x = x.view(-1, 2, 60, 41) # image_# x n_channel x width x height
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 12 * 7)
+        x = x.view(-1, 2, 60, 41) # image_# x n_channel x height x width
+        x = self.pool1(F.relu(self.conv1(x)))
+        x = F.dropout(x, training=self.training)
+        x = self.pool2(F.relu(self.conv2(x)))
+        x = x.view(-1, 6)
         x = F.relu(self.fc1(x))
+        x = F.dropout(x, training=self.training)
         x = F.relu(self.fc2(x))
+        x = F.dropout(x, training=self.training)
         return F.softmax(x, dim=1)
 
 
 if __name__ == '__main__':
+    print('Loading data')
     dset_train = SoundDataset(features_file='../data/urbansound_train_features_CNN.npy',
                               labels_file='../data/urbansound_train_labels_CNN.npy')
     dset_test = SoundDataset(features_file='../data/urbansound_test_features_CNN.npy',
@@ -93,7 +100,7 @@ if __name__ == '__main__':
 
     # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
 
     # Train the Model
     for epoch in range(num_epochs):
@@ -108,7 +115,6 @@ if __name__ == '__main__':
             optimizer.step()
 
             # print statistics
-            # if epoch % (num_epochs // 10) == 0 and batch_idx % 10 == 0:
             if batch_idx % 10 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch,
