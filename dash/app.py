@@ -1,37 +1,30 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 
 app = dash.Dash()
+INPUT_ID = 'my-id'
+OUTPUT_ID = 'my-div'
 
-colors = {
-    'background': '#111111',
-    'text': '#7FDBFF'
-}
+app.css.append_css({
+    "external_url": "https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+})
 
-app.layout = html.Div(
-    children=[
-        html.H1(children='Hello Dash'),
+app.layout = html.Div([
+    html.H1(children='Hello world'),
+    dcc.Input(id=INPUT_ID, value='initial value', type='text'),
+    html.Div(id=OUTPUT_ID)
+])
 
-        html.Div(children='''
-        Dash: A web application framework for Python.
-    '''),
 
-        dcc.Graph(
-            id='graph',
-            figure={
-                'data': [
-                    {'x': [1, 2, 3], 'y': [4, 1, 2],
-                        'type': 'bar', 'name': 'SF'},
-                    {'x': [1, 2, 3], 'y': [2, 4, 5],
-                     'type': 'bar', 'name': u'Montréal'},
-                ],
-                'layout': {
-                    'title': 'Dash Data Visualization'
-                }
-            }
-        )
-    ])
+@app.callback(
+    Output(component_id=OUTPUT_ID, component_property='children'),
+    [Input(component_id=INPUT_ID, component_property='value')]
+)
+def update_output_div(input_value):
+    return 'You\'ve entered "{}"'.format(input_value)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
