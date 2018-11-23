@@ -1,0 +1,17 @@
+numpy
+jupyter
+jupyterlab
+matplotlib
+pandas
+pyyaml
+scikit-learn
+scipy
+seaborn
+tensorflow
+#tensorflow-data-validation
+tensorflow-hub
+#tensorflow-model-analysis
+#tensorflow-probability
+#tensorflow-transform
+#tensor2tensor
+tqdm
