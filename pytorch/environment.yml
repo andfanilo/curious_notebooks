@@ -1,0 +1,16 @@
+name: pytorch
+channels:
+  - pytorch
+  - defaults
+  - anaconda
+  - conda-forge
+dependencies:
+  - jupyter
+  - jupyterlab
+  - matplotlib
+  - numpy
+  - pandas
+  - python=3.6
+  - pytorch-cpu=0.4.1
+  - pip:
+    - torch==0.4.1
