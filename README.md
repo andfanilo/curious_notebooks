@@ -2,8 +2,10 @@
 
 A dump of all the notebooks I wrote to test Python libs and other curious analysis.
 
-* [dash](https://plot.ly/products/dash/) - Build beautiful web-based interfaces in Python
+* [Dash](https://plot.ly/products/dash/) - Build beautiful web-based interfaces in Python
+* [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/) - Interactive HTML widgets for Jupyter notebooks and the IPython kernel. Better demo on my [COTRECS folder](https://github.com/andfanilo/cotrecs_20181109).
 * [Jupyter Kernel Gateway](https://jupyter-kernel-gateway.readthedocs.io/en/latest/) - Web server that provides headless access to Jupyter kernels
-* [pytorch](https://pytorch.org/) - Open source deep learning platform
-* [spark](http://spark.apache.org/docs/latest/api/python/pyspark.html) - Python API for Spark
+* [PyTorch](https://pytorch.org/) - Open source deep learning platform
+* [TensorFlow](https://www.tensorflow.org/) - An open source machine learning framework for everyone
+* [Spark](http://spark.apache.org/docs/latest/api/python/pyspark.html) - Python API for Spark
 * Tutorials - A bunch of notebooks for fun analysis, and eventually future interviewing questions XD
