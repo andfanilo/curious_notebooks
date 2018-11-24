@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "C:\\Utilisateurs\\a557847\\AppData\\Local\\Continuum\\anaconda3\\envs\\pytorch\\python.exe",
+    "python.formatting.provider": "black"
+}
