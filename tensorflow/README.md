@@ -1,0 +1,1 @@
+To launch TensorBoard : `tensorboard --logdir=./log`
