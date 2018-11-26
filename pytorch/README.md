@@ -9,7 +9,7 @@ A structured environment for playing with pytorch
 ## Installation
 
 ```
-conda env create -f enironment.yml
+conda env create -f environment.yml
 conda activate pytorch
 pip install -e .
 ```

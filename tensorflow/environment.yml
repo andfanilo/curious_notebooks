@@ -1,0 +1,22 @@
+name: tensorflow
+channels:
+  - anaconda
+dependencies:
+  - jupyter
+  - jupyterlab
+  - matplotlib
+  - numpy
+  - pandas
+  - python=3.6
+  - scikit-learn
+  - pip:
+      - black
+      - path.py
+      - pylint
+      - tensorflow
+      -  #tensorflow-data-validation
+      - tensorflow-hub
+      - tensorflow-probability
+      -  #tensorflow-model-analysis
+      -  #tensorflow-transform
+      -  #tensor2tensor
