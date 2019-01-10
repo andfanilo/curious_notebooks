@@ -1,0 +1,17 @@
+name: fastai
+channels:
+  - pytorch
+  - fastai
+  - defaults
+  - anaconda
+dependencies:
+  - fastai
+  - jupyter
+  - jupyterlab
+  - matplotlib
+  - numpy
+  - pandas
+  - python=3.6
+  - pytorch-cpu
+  - scikit-learn
+  - torchvision-cpu
