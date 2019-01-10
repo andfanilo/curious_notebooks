@@ -1,0 +1,22 @@
+name: pymc3
+channels:
+  - anaconda
+  - conda-forge
+dependencies:
+  - jupyter
+  - jupyterlab
+  - matplotlib
+  - python=3.5
+  # theano install
+  - numpy
+  #- m2w64-toolchain
+  #- mkl-service 
+  #- libpython
+  #- scipy
+  #- theano 
+  #- pygpu
+  - pip:
+    - autopep8
+    - path.py
+    - pylint
+    - pymc3
