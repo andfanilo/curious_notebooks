@@ -10,4 +10,4 @@ A dump of all the notebooks I wrote to test Python libs and other curious analys
 - [PyMC3](https://docs.pymc.io/index.html) - Bayesian statistical modeling and Probabilistic Machine Learning focusing on advanced Markov chain Monte Carlo (MCMC) and variational inference (VI) algorithms
 - [TensorFlow](https://www.tensorflow.org/) - An open source machine learning framework for everyone
 - [Spark](http://spark.apache.org/docs/latest/api/python/pyspark.html) - Python API for Spark
-- Tutorials - A bunch of notebooks for fun analysis, and eventually future interviewing questions XD
+- Notebooks - A bunch of notebooks for fun analysis, and eventually future interviewing questions XD
